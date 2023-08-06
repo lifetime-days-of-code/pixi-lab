@@ -1,16 +1,39 @@
 import * as PIXI from 'pixi.js';
-import sample from './sample.png'
-
-let app = new PIXI.Application({width: 640, height: 360});
-let sprite = PIXI.Sprite.from(sample);
-let elapsed = 0.0;
-
+import monster from './sample.png';
+const app = new PIXI.Application({width: 640, height: 360});
+globalThis.__PIXI_APP__ = app;
 document.body.appendChild(app.view);
 
-app.stage.addChild(sprite);
+const container = new PIXI.Container();
+container.x = app.screen.width / 2;
+container.y = app.screen.height / 2;
+app.stage.addChild(container);
 
-app.ticker.add((deltatime) => {
-    elapsed += deltatime;
+const sprites = [];
+let parent = container;
+for (let i = 0; i < 3; i++) {
+    let sprite = PIXI.Sprite.from(monster);
+    sprite.anchor.set(0,5);
+    parent.addChild(sprite);
+    sprites.push(sprite);
+    parent = sprite;
+}
 
-    sprite.x = 100.0 + Math.cos(elapsed / 50.0) * 100.0;
+let elapsed = 0.0;
+
+app.ticker.add((delta) => {
+    elapsed +=delta / 60;
+    const amount = Math.sin(elapsed);
+    const scale = 1.0 + 0.25 * amount;
+    const alpha = 0.75 + 0.25 * amount;
+    const angle = 40* amount;
+    const x = 75 * amount;
+    for(let i = 0; i < sprites.length; i ++) {
+        const sprite = sprites[i];
+        sprite.scale.set(scale);
+        sprite.alpha = alpha;
+        sprite.angle = angle;
+        sprite.x = x;
+    }
 })
+
